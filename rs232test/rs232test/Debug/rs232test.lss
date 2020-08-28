@@ -1,0 +1,157 @@
+
+rs232test.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000007e  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  000000d2  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  000000d2  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000104  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000048  00000000  00000000  00000140  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   0000060e  00000000  00000000  00000188  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 0000054b  00000000  00000000  00000796  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000004b8  00000000  00000000  00000ce1  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000074  00000000  00000000  0000119c  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00006352  00000000  00000000  00001210  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000013  00000000  00000000  00007562  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000038  00000000  00000000  00007575  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 12 .debug_macro  0000045a  00000000  00000000  000075ad  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	12 c0       	rjmp	.+36     	; 0x26 <__ctors_end>
+   2:	19 c0       	rjmp	.+50     	; 0x36 <__bad_interrupt>
+   4:	18 c0       	rjmp	.+48     	; 0x36 <__bad_interrupt>
+   6:	17 c0       	rjmp	.+46     	; 0x36 <__bad_interrupt>
+   8:	16 c0       	rjmp	.+44     	; 0x36 <__bad_interrupt>
+   a:	15 c0       	rjmp	.+42     	; 0x36 <__bad_interrupt>
+   c:	14 c0       	rjmp	.+40     	; 0x36 <__bad_interrupt>
+   e:	13 c0       	rjmp	.+38     	; 0x36 <__bad_interrupt>
+  10:	12 c0       	rjmp	.+36     	; 0x36 <__bad_interrupt>
+  12:	11 c0       	rjmp	.+34     	; 0x36 <__bad_interrupt>
+  14:	10 c0       	rjmp	.+32     	; 0x36 <__bad_interrupt>
+  16:	0f c0       	rjmp	.+30     	; 0x36 <__bad_interrupt>
+  18:	0e c0       	rjmp	.+28     	; 0x36 <__bad_interrupt>
+  1a:	0d c0       	rjmp	.+26     	; 0x36 <__bad_interrupt>
+  1c:	0c c0       	rjmp	.+24     	; 0x36 <__bad_interrupt>
+  1e:	0b c0       	rjmp	.+22     	; 0x36 <__bad_interrupt>
+  20:	0a c0       	rjmp	.+20     	; 0x36 <__bad_interrupt>
+  22:	09 c0       	rjmp	.+18     	; 0x36 <__bad_interrupt>
+  24:	08 c0       	rjmp	.+16     	; 0x36 <__bad_interrupt>
+
+00000026 <__ctors_end>:
+  26:	11 24       	eor	r1, r1
+  28:	1f be       	out	0x3f, r1	; 63
+  2a:	cf e5       	ldi	r28, 0x5F	; 95
+  2c:	d4 e0       	ldi	r29, 0x04	; 4
+  2e:	de bf       	out	0x3e, r29	; 62
+  30:	cd bf       	out	0x3d, r28	; 61
+  32:	1a d0       	rcall	.+52     	; 0x68 <main>
+  34:	22 c0       	rjmp	.+68     	; 0x7a <_exit>
+
+00000036 <__bad_interrupt>:
+  36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
+
+00000038 <init_USART>:
+	UCSRA |=(0 << U2X);
+}
+
+void send_UART(char value) {
+	while(!( UCSRA & (1 << UDRE)));   // Ожидаем когда очистится буфер передачи
+	UDR = value; // Помещаем данные в буфер, начинаем передачу
+  38:	89 e1       	ldi	r24, 0x19	; 25
+  3a:	89 b9       	out	0x09, r24	; 9
+  3c:	10 bc       	out	0x20, r1	; 32
+  3e:	53 9a       	sbi	0x0a, 3	; 10
+  40:	54 9a       	sbi	0x0a, 4	; 10
+  42:	80 b5       	in	r24, 0x20	; 32
+  44:	86 68       	ori	r24, 0x86	; 134
+  46:	80 bd       	out	0x20, r24	; 32
+  48:	8b b1       	in	r24, 0x0b	; 11
+  4a:	8b b9       	out	0x0b, r24	; 11
+  4c:	08 95       	ret
+
+0000004e <USART_Receive>:
+}
+
+unsigned char USART_Receive( void )
+{
+	/* Wait for data to be received */
+	while ( !(UCSRA & (1<<RXC)) )
+  4e:	5f 9b       	sbis	0x0b, 7	; 11
+  50:	fe cf       	rjmp	.-4      	; 0x4e <USART_Receive>
+	;
+	/* Get and return received data from buffer */
+	return UDR;
+  52:	8c b1       	in	r24, 0x0c	; 12
+}
+  54:	08 95       	ret
+
+00000056 <spi_init>:
+
+void spi_init(void) 
+{
+	DDRB = (1 << MOSI) | (1 << SS) | (1<<SCK);
+  56:	8c e2       	ldi	r24, 0x2C	; 44
+  58:	87 bb       	out	0x17, r24	; 23
+	SPCR = (1<<SPE) | (1<< MSTR) | (1<<SPR0);
+  5a:	81 e5       	ldi	r24, 0x51	; 81
+  5c:	8d b9       	out	0x0d, r24	; 13
+  5e:	08 95       	ret
+
+00000060 <spi_send_data>:
+}
+
+void spi_send_data(char spi_data) 
+{
+	SPDR = spi_data;
+  60:	8f b9       	out	0x0f, r24	; 15
+	while(!(SPSR & (1<<SPIF)));
+  62:	77 9b       	sbis	0x0e, 7	; 14
+  64:	fe cf       	rjmp	.-4      	; 0x62 <spi_send_data+0x2>
+}
+  66:	08 95       	ret
+
+00000068 <main>:
+
+int main(void)
+{
+	
+	spi_init();
+  68:	f6 df       	rcall	.-20     	; 0x56 <spi_init>
+	init_USART();    // init USART  9600/8-N-1
+  6a:	e6 df       	rcall	.-52     	; 0x38 <init_USART>
+	spi_send_data(0x03);
+  6c:	83 e0       	ldi	r24, 0x03	; 3
+  6e:	f8 df       	rcall	.-16     	; 0x60 <spi_send_data>
+	spi_send_data(0x03);
+  70:	83 e0       	ldi	r24, 0x03	; 3
+  72:	f6 df       	rcall	.-20     	; 0x60 <spi_send_data>
+	char data;
+	while (1)
+	{		
+		data = USART_Receive();
+  74:	ec df       	rcall	.-40     	; 0x4e <USART_Receive>
+		spi_send_data(data);		
+  76:	f4 df       	rcall	.-24     	; 0x60 <spi_send_data>
+  78:	fd cf       	rjmp	.-6      	; 0x74 <main+0xc>
+
+0000007a <_exit>:
+  7a:	f8 94       	cli
+
+0000007c <__stop_program>:
+  7c:	ff cf       	rjmp	.-2      	; 0x7c <__stop_program>
