@@ -1,13 +1,13 @@
-#define F_CPU 2000000UL // Рабочая частота контроллера
-#define BAUD 4800 // Скорость обмена данными
-#define UBRRL_value 25//(F_CPU/(BAUD*16))-1 //Согластно заданной скорости подсчитываем значение для регистра UBRR
+//def Usart
+#define F_CPU 2000000UL // Controller operating frequency
+#define BAUD 4800 // Communication speed
+#define UBRRL_value 25//(F_CPU/(BAUD*16))-1 // According to the given speed, calculate the value for the register UBRR
+
 //def spi
 #define SS 2
 #define MOSI 3
 #define MISO 4
 #define SCK 5
-
-
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -15,19 +15,19 @@
 
 //USART functions:
 void init_USART() {
-	UBRRL = UBRRL_value;       //Младшие 8 бит UBRRL_value
-	UBRRH = UBRRL_value >> 8;  //Старшие 8 бит UBRRL_value
-	UCSRB |=(1<<TXEN);         //Бит разрешения передачи
+	UBRRL = UBRRL_value;       //Lowest 8 bits UBRRL_value
+	UBRRH = UBRRL_value >> 8;  //Highest 8 bits UBRRL_value
+	UCSRB |=(1<<TXEN);         //Transmit enable bit
 	//
-	UCSRB |=(1<<RXEN);		   //Бит разрешения приема
+	UCSRB |=(1<<RXEN);		   //Receive enable bit
 	//
-	UCSRC |=(1<< URSEL)|(1<< UCSZ0)|(1<< UCSZ1); //Устанавливем формат 8 бит данных
+	UCSRC |=(1<< URSEL)|(1<< UCSZ0)|(1<< UCSZ1); //Set the format to 8 data bits
 	UCSRA |=(0 << U2X);
 }
 
 void send_UART(char value) {
-	while(!( UCSRA & (1 << UDRE)));   // Ожидаем когда очистится буфер передачи
-	UDR = value; // Помещаем данные в буфер, начинаем передачу
+	while(!( UCSRA & (1 << UDRE)));   // Waiting for the transfer buffer to clear
+	UDR = value; // put the data in the buffer, start the transfer
 }
 
 unsigned char USART_Receive( void )
@@ -55,7 +55,7 @@ int main(void)
 {
 	
 	spi_init();
-	init_USART();    // init USART  9600/8-N-1
+	init_USART();    // init USART  4800/8-N-1
 	spi_send_data(0x03);
 	spi_send_data(0x03);
 	char data;

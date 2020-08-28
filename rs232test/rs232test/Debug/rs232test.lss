@@ -71,8 +71,8 @@ Disassembly of section .text:
 }
 
 void send_UART(char value) {
-	while(!( UCSRA & (1 << UDRE)));   // Ожидаем когда очистится буфер передачи
-	UDR = value; // Помещаем данные в буфер, начинаем передачу
+	while(!( UCSRA & (1 << UDRE)));   // Waiting for the transfer buffer to clear
+	UDR = value; // put the data in the buffer, start the transfer
   38:	89 e1       	ldi	r24, 0x19	; 25
   3a:	89 b9       	out	0x09, r24	; 9
   3c:	10 bc       	out	0x20, r1	; 32
@@ -133,7 +133,7 @@ int main(void)
 	
 	spi_init();
   68:	f6 df       	rcall	.-20     	; 0x56 <spi_init>
-	init_USART();    // init USART  9600/8-N-1
+	init_USART();    // init USART  4800/8-N-1
   6a:	e6 df       	rcall	.-52     	; 0x38 <init_USART>
 	spi_send_data(0x03);
   6c:	83 e0       	ldi	r24, 0x03	; 3
