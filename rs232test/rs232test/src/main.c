@@ -13,6 +13,10 @@
 #include <util/delay.h>
 #include <stdio.h>
 
+unsigned long value1 = 23;
+unsigned long value2 = 78;
+unsigned long value3 = 870;
+
 //USART functions:
 void init_USART() {
 	UBRRL = UBRRL_value;       //Lowest 8 bits UBRRL_value
@@ -25,7 +29,7 @@ void init_USART() {
 	UCSRA |=(0 << U2X);
 }
 
-void send_UART(char value) {
+void send_USART(char value) {
 	while(!( UCSRA & (1 << UDRE)));   // Waiting for the transfer buffer to clear
 	UDR = value; // put the data in the buffer, start the transfer
 }
@@ -45,10 +49,42 @@ void spi_init(void)
 	SPCR = (1<<SPE) | (1<< MSTR) | (1<<SPR0);
 }
 
-void spi_send_data(char spi_data) 
+void spi_send_data(unsigned char spi_data) 
 {
 	SPDR = spi_data;
 	while(!(SPSR & (1<<SPIF)));
+}
+
+void fill_array(unsigned char *arr) 
+{
+	for (int i = 0; i < 4; i++)
+	{
+		arr[i] = USART_Receive();
+	}
+		
+}
+ 
+ 
+ 
+void get_long_values()
+{
+	unsigned char byte_array[4] = {0};
+	fill_array(byte_array);
+	//
+	send_USART(byte_array[0]);
+	send_USART(byte_array[1]);
+	send_USART(byte_array[2]);
+	send_USART(byte_array[3]);
+	//
+	value1 = 0;
+	for(int i = 3; i >= 0; i--)
+	{
+		value1 |= (unsigned long) byte_array[i];
+		if (i != 0)
+			value1 = value1 << 8;		
+	}
+	
+	
 }
 
 int main(void)
@@ -56,13 +92,26 @@ int main(void)
 	
 	spi_init();
 	init_USART();    // init USART  4800/8-N-1
-	spi_send_data(0x03);
-	spi_send_data(0x03);
-	char data;
+	
+	unsigned char data;
 	while (1)
 	{		
+		
 		data = USART_Receive();
-		spi_send_data(data);		
+		if (data == '+')
+		{
+			get_long_values();
+			if(value1 == 1234567890)
+			{
+				spi_send_data('1');
+			}
+			if(value1 == 9548333)
+			{
+				spi_send_data('0');
+			}
+			
+		}
+			
 	}
 	
 	
